@@ -1,0 +1,85 @@
+module CameCase
+	(
+		isInDic,
+		dropMaxDic,
+		dropMinDic
+	)
+	
+where
+
+import Data.Char (toUpper, toLower)
+import Data.List
+import Data.List.Split
+
+maxWordSize :: Int
+maxWordSize = 6
+
+minWordSize :: Int
+minWordSize = 2
+
+
+test1 = "helloanyonethere"
+test2 = "himartin"
+test3 = "hellorange"
+test4 = "thereach"
+
+dictionary = do
+    dict <- readFile "UK.txt"
+    let dic = reverse $ words dict
+    return dic
+		
+isInDic :: String -> [String] -> Bool
+isInDic str dic = elem str dic
+        
+dropMaxDic :: Int -> String -> [String] -> [String]
+dropMaxDic n str dic 
+    | n == minWordSize    = []
+    | otherwise = 
+        if  (foundInDic == True)
+        then
+            capitalize : dropMaxDic maxWordSize removed dic
+        else
+            dropMaxDic (n - 1) str dic
+    where
+        wordToSearch = take n str
+        capitalize = toUpper (wordToSearch!!0) : drop 1 wordToSearch
+        foundInDic = isInDic wordToSearch dic
+        removed = drop n str
+        
+dropMinDic :: Int -> String -> [String] -> [String]
+dropMinDic n str dic 
+    | n == maxWordSize    = []
+    | otherwise = 
+        if  (foundInDic == True)
+        then
+            capitalize : dropMinDic minWordSize removed dic
+        else
+            dropMinDic (n + 1) str dic
+    where
+        wordToSearch = take n str
+        capitalize = toUpper (wordToSearch!!0) : drop 1 wordToSearch
+        foundInDic = isInDic wordToSearch dic
+        removed = drop n str
+
+main = do
+	dictionary <- readFile "UK.txt"
+	let listDic = reverse $ words dictionary
+--	userInput <- getLine
+--	let lowered = reverse $ subsequences $ map toLower userInput
+--	print listDic
+--	print lowered
+--    print test1
+	print $ dropMaxDic maxWordSize test1 listDic
+--	print test2
+	print $ dropMaxDic maxWordSize test2 listDic
+--	print test3
+	print $ dropMaxDic maxWordSize test3 listDic
+	print $ dropMaxDic maxWordSize test4 listDic
+	
+	
+	print $ dropMinDic (minWordSize + 1) test1 listDic
+--	print test2
+	print $ dropMinDic (minWordSize + 1) test2 listDic
+--	print test3
+	print $ dropMinDic (minWordSize + 1) test3 listDic
+	print $ dropMinDic (minWordSize + 1) test4 listDic
